@@ -15,6 +15,11 @@ class Settings:
     # the API still builds projects, it just doesn't record them.
     database_url: str = os.getenv("DATABASE_URL", "")
 
+    # Build-result cache (Phase 3). Empty disables caching; identical requests
+    # then always rebuild. TTL bounds how long a cached ZIP is served.
+    redis_url: str = os.getenv("REDIS_URL", "")
+    build_cache_ttl: int = int(os.getenv("BUILD_CACHE_TTL", "3600"))
+
     # LLM — OpenAI-compatible endpoint. Defaults target a local Ollama server
     # (qwen2.5:1.5b). Ollama exposes an OpenAI-compatible API at /v1, so the same
     # ChatOpenAI client swaps to vLLM later by changing these env vars only.

@@ -95,6 +95,15 @@ down, builds keep working — they just aren't recorded. Docker Compose ships a
 `postgres:16` service wired in automatically; for bare local dev use SQLite
 (`DATABASE_URL=sqlite:///./builds.db`) or leave it empty.
 
+## Build cache (Phase 3 — Redis)
+
+When `REDIS_URL` is set, a successful build is cached keyed on the (normalized)
+request text. An identical request within `BUILD_CACHE_TTL` (default 1 h) returns
+the cached ZIP instantly — no LLM run — marked with an `X-Cache: hit` header and
+not re-recorded in history. Same opt-in/best-effort rules as the database: no
+Redis, or Redis down, and every request simply builds fresh. Docker Compose
+ships a `redis:7` service wired in automatically.
+
 ## CI/CD
 
 `.github/workflows/ci.yml` runs on every push/PR: **ruff** lint → **pytest** (hermetic — no
@@ -110,5 +119,5 @@ venv/Scripts/pytest
 
 - **Phase 1 (done):** single-agent templates-first generator → ZIP.
 - **Phase 2 (done):** split into planner → architecture → backend → database → testing → reviewer nodes.
-- **Phase 3 (in progress):** AWS backing — Postgres build history ✔; vLLM on EC2 GPU, Redis, S3 next.
+- **Phase 3 (in progress):** AWS backing — Postgres build history ✔, Redis build cache ✔; vLLM on EC2 GPU, S3 next.
 - **Phase 4–7:** GitHub push, Docker verify, CI/CD generation, ECS deploy agent.

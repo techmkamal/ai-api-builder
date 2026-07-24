@@ -15,8 +15,14 @@ src = ["src", "tests"]
 extend-exclude = ["src/agents/api_builder_agent/templates"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
+# E/F/W: pycodestyle+pyflakes, I: import order, B: bugbear (likely bugs),
+# UP: modern syntax, SIM: needless complexity, C4: comprehension misuse.
+select = ["E", "F", "I", "W", "B", "UP", "SIM", "C4"]
 
 [tool.ruff.lint.per-file-ignores]
 # server.py imports after load_dotenv() on purpose, so env is set before app modules load.
 "src/server.py" = ["E402"]
+
+[tool.coverage.run]
+# Jinja templates are project output, not service code — keep them out of the metric.
+omit = ["src/agents/api_builder_agent/templates/*"]

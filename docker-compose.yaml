@@ -32,6 +32,14 @@ services:
       timeout: 3s
       retries: 10
 
+  cache:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   api-builder:
     build: .
     ports:
@@ -42,10 +50,14 @@ services:
       - LLM_MODEL=${LLM_MODEL:-qwen2.5:1.5b}
       - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.1}
       - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/builder
+      - REDIS_URL=redis://cache:6379/0
+      - BUILD_CACHE_TTL=${BUILD_CACHE_TTL:-3600}
     depends_on:
       ollama:
         condition: service_started
       db:
+        condition: service_healthy
+      cache:
         condition: service_healthy
 
 volumes:

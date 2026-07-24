@@ -26,9 +26,10 @@ jobs:
       - name: Lint (ruff)
         run: ruff check src tests
 
-      - name: Tests (pytest)
+      - name: Tests with coverage gate (pytest)
         # No LLM in CI — the planner falls back to heuristics, so the suite is hermetic.
-        run: pytest
+        # The build fails if service-code coverage drops below 85%.
+        run: pytest --cov=src --cov-report=term-missing --cov-fail-under=85
 
   docker-build:
     runs-on: ubuntu-latest

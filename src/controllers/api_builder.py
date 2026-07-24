@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
 
+import cache
 import db
 from agents.api_builder_agent.graph import get_default_app
 
@@ -36,9 +37,21 @@ class BuildRequest(BaseModel):
 def build(payload: BuildRequest) -> Response:
     """Generate a FastAPI project from a plain-English description and return it as a ZIP.
 
-    Every run is recorded in the build history when a database is configured;
-    recording is best-effort and never blocks the build response.
+    Identical requests are served from the Redis cache when one is configured
+    (marked with an X-Cache: hit header and not re-recorded in history). Every
+    fresh run is recorded in the build history when a database is configured;
+    caching and recording are best-effort and never block the build response.
     """
+    cached = cache.get_cached_build(payload.request)
+    if cached:
+        project, zip_bytes = cached
+        return Response(
+            content=zip_bytes,
+            media_type="application/zip",
+            headers={"Content-Disposition": f'attachment; filename="{project}.zip"',
+                     "X-Cache": "hit"},
+        )
+
     result = _app.invoke({"request": payload.request})
 
     if result.get("error"):
@@ -56,6 +69,7 @@ def build(payload: BuildRequest) -> Response:
                                zip_bytes=zip_bytes)
 
     project = result.get("spec", {}).get("project_name", "generated-api")
+    cache.cache_build(payload.request, project, zip_bytes)
     headers = {"Content-Disposition": f'attachment; filename="{project}.zip"'}
     if build_id is not None:
         headers["X-Build-Id"] = str(build_id)
