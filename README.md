@@ -62,9 +62,13 @@ never finishes loading and requests stall. Set `LLM_MODEL` to switch.
 
 ```bash
 python -m venv venv
-venv/Scripts/pip install -r requirements.txt
+venv/Scripts/pip install -r requirements.in
 cd src && ../venv/Scripts/uvicorn server:app --reload --port 8080
 ```
+
+Local dev installs from `requirements.in` (direct pins). `requirements.txt` is the
+hash-locked resolution for the Linux/Python 3.12 environment Docker and CI use —
+regenerate it with `make lock` after changing `requirements.in`.
 
 This talks to an Ollama server on the host (`http://localhost:11434/v1`). Install Ollama,
 then `ollama pull qwen2.5:3b`. See `.env.example` to point at a different endpoint (e.g. vLLM).

@@ -18,7 +18,9 @@ _TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates" / "fastapi
 # Template filename -> output path, grouped by the node responsible for rendering it.
 _SCAFFOLD_TEMPLATES = {
     "requirements.txt.jinja": "requirements.txt",
-    "Dockerfile.jinja": "Dockerfile",
+    # Named container-image.jinja (not Dockerfile.jinja) so scanners don't
+    # misclassify the template itself as a Dockerfile of this service.
+    "container-image.jinja": "Dockerfile",
     "docker-compose.yml.jinja": "docker-compose.yml",
     "env.example.jinja": ".env.example",
     "gitignore.jinja": ".gitignore",

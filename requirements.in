@@ -1,0 +1,26 @@
+# Direct dependencies — edit this file, then regenerate the hash-locked
+# requirements.txt with: make lock  (pip-compile inside python:3.12-slim)
+
+fastapi[standard]==0.139.2
+uvicorn==0.51.0
+python-dotenv==1.2.2
+jinja2==3.1.6
+
+# Build-history persistence (Phase 3)
+sqlalchemy==2.0.51
+psycopg[binary]==3.3.4
+
+# Build-result cache (Phase 3)
+redis==8.0.1
+
+# AI agent
+langgraph==1.2.9
+langchain-core==1.5.1
+langchain-openai==1.4.1
+pydantic==2.13.4
+
+# Testing
+pytest==9.1.1
+pytest-cov==7.1.0
+httpx==0.28.1
+fakeredis==2.37.0
